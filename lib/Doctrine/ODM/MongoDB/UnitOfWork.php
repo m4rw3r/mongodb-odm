@@ -1609,7 +1609,7 @@ class UnitOfWork implements PropertyChangedListener
          */
         $id = $class->getIdentifierValue($document);
 
-        if ( ! $id) {
+        if ($id === null) {
             return self::STATE_NEW;
         }
 
