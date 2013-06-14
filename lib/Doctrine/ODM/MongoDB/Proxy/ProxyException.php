@@ -46,4 +46,9 @@ class ProxyException extends MongoDBException
     {
         return new self("You must configure a proxy namespace. See docs for details");
     }
+
+    public static function proxyFileWriteFailed($tmpFile)
+    {
+        return new self("Failed to write Proxy class to temporary file \"$tmpFile\".");
+    }
 }

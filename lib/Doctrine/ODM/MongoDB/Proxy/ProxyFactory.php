@@ -195,7 +195,29 @@ class ProxyFactory
             throw ProxyException::proxyDirectoryNotWritable();
         }
 
-        file_put_contents($fileName, $file, LOCK_EX);
+        /*
+         * We need to write to a temporary file first, to prevent other
+         * php-processes from reading from it while we are writing.
+         * We can't trust LOCK_EX to provide an exclusive lock on all
+         * platforms.
+         */
+        $tmpFileName = $fileName.getmypid();
+
+        $bytecount = file_put_contents($tmpFileName, $file);
+
+        if( ! $bytecount) {
+            throw ProxyException::proxyFileWriteFailed($tmpFileName);
+        }
+
+        if( ! @rename($tmpFileName, $fileName)) {
+            /*
+             * Soft error here because another process might already have
+             * created the file.
+             */
+            trigger_error(sprintf('Failed to move temporary file "%s" into place, destination: "%s".', $tmpFileName, $fileName), E_USER_NOTICE);
+
+            @unlink($tmpFileName);
+        }
     }
 
     /**
