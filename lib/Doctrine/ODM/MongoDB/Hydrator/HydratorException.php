@@ -43,4 +43,9 @@ class HydratorException extends MongoDBException
     {
         return new self("You must create a hydrator directory specified");
     }
+
+    public static function hydratorFileWriteFailed($tmpFile)
+    {
+        return new self("Failed to write Hydrator class to temporary file \"$tmpFile\".");
+    }
 }
